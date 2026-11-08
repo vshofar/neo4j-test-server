@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'dev.neo4jtest'
+version = '0.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.neo4j.test:neo4j-harness:2026.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.1'
+
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.neo4j.driver:neo4j-java-driver:6.3.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'neo4jtest.server.Neo4jTestServer'
+    applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8']
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register('printClasspath') {
+    doLast {
+        println sourceSets.main.runtimeClasspath.asPath
+    }
+}
