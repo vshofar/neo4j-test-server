@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Example client for neo4j-test-server.
 
-Launches the Java test server as a subprocess, reads the readiness
-JSON from stdout, connects via the Neo4j Python driver, runs a
-query, and shuts the server down via stdin.
+Launches the fat JAR as a subprocess, reads the readiness JSON from
+stdout, connects via the Neo4j Python driver, runs a query, and shuts
+the server down via stdin.
+
+Prerequisite: build the JAR once with `./gradlew shadowJar` from the
+project root. Only a Java 21+ runtime is needed to run it.
 """
 
 import json
@@ -14,18 +17,7 @@ from pathlib import Path
 from neo4j import GraphDatabase
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-GRADLEW = PROJECT_ROOT / "gradlew"
-
-
-def java_classpath() -> str:
-    result = subprocess.run(
-        [str(GRADLEW), "-q", "printClasspath"],
-        cwd=PROJECT_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout.strip()
+JAR = PROJECT_ROOT / "build" / "libs" / "neo4j-test-server-all.jar"
 
 
 def read_ready(process: subprocess.Popen) -> dict:
@@ -38,15 +30,11 @@ def read_ready(process: subprocess.Popen) -> dict:
 
 
 def main() -> None:
-    classpath = java_classpath()
+    if not JAR.exists():
+        sys.exit(f"JAR not found: {JAR}\nRun './gradlew shadowJar' first.")
+
     process = subprocess.Popen(
-        [
-            "java",
-            "-Dfile.encoding=UTF-8",
-            "-cp",
-            classpath,
-            "neo4jtest.server.Neo4jTestServer",
-        ],
+        ["java", "-jar", str(JAR)],
         cwd=PROJECT_ROOT,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,

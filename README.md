@@ -36,14 +36,41 @@ Ele sobe uma instância do Neo4j via [neo4j-harness](https://neo4j.com/docs/oper
 ## Build e testes
 
 ```bash
-./gradlew build      # compila e roda os testes
-./gradlew test       # apenas os testes
-./gradlew run        # sobe o servidor interativamente
+./gradlew build       # compila e roda os testes
+./gradlew test        # apenas os testes
+./gradlew run         # sobe o servidor interativamente
+./gradlew shadowJar   # gera o fat JAR autocontido
 ```
 
-## Uso como biblioteca de teste
+## Uso em projetos Python (sem Gradle/Maven)
 
-Qualquer linguagem pode consumir o servidor como sidecar:
+Gere o fat JAR uma vez:
+
+```bash
+./gradlew shadowJar
+# gera build/libs/neo4j-test-server-all.jar (~165 MB, autocontido)
+```
+
+O JAR embute todas as dependências (neo4j-harness, Kotlin, Jackson etc.). Em runtime, **apenas Java 21+ é necessário** — nada de Gradle ou Maven:
+
+```python
+import subprocess, json
+
+process = subprocess.Popen(
+    ["java", "-jar", "neo4j-test-server-all.jar"],
+    stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True,
+)
+ready = json.loads(next(l for l in process.stdout if l.startswith("{")))
+# ready["bolt_uri"], ready["username"], ready["password"]
+# ... use o driver neo4j ...
+process.stdin.write("shutdown\n")  # encerra o servidor
+```
+
+Veja [`examples/python/example_client.py`](examples/python/example_client.py) para um exemplo completo.
+
+## Uso como biblioteca de teste (classpath)
+
+Para desenvolvimento dentro do próprio projeto Gradle:
 
 ```bash
 java -cp "$(./gradlew -q printClasspath)" neo4jtest.server.Neo4jTestServer --working-dir /tmp/neo4j-data

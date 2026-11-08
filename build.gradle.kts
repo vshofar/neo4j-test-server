@@ -1,3 +1,4 @@
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -5,6 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.2.21"
     application
+    id("com.gradleup.shadow") version "9.2.2"
 }
 
 group = "dev.neo4jtest"
@@ -58,5 +60,17 @@ tasks.register("printClasspath") {
     doLast {
         val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
         println(sourceSets["main"].runtimeClasspath.asPath)
+    }
+}
+
+tasks.shadowJar {
+    archiveFileName.set("neo4j-test-server-all.jar")
+    isZip64 = true
+    manifest {
+        attributes["Main-Class"] = "neo4jtest.server.Neo4jTestServer"
+    }
+    mergeServiceFiles()
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
