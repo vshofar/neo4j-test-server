@@ -76,3 +76,7 @@ examples/python/
 ├── example_client.py        # cliente de exemplo que consome o servidor
 └── requirements.txt
 ```
+
+## Licença
+
+[MIT](LICENSE) © 2026 vshofar
