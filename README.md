@@ -42,7 +42,42 @@ Ele sobe uma instância do Neo4j via [neo4j-harness](https://neo4j.com/docs/oper
 ./gradlew shadowJar   # gera o fat JAR autocontido
 ```
 
+## Monorepo
+
+Este repositório contém dois artefatos:
+
+| Artefato | Local | Distribuição |
+|---|---|---|
+| Servidor Neo4j (Kotlin) | `src/` | Fat JAR via GitHub Releases |
+| Pacote Python | `python/` | PyPI (`pip install neo4j-test-server`) |
+
+O pacote Python baixa o JAR do GitHub Releases automaticamente na primeira
+utilização e o cacheia localmente — em runtime, apenas Java 21+ é necessário.
+
 ## Uso em projetos Python (sem Gradle/Maven)
+
+### Via pip (recomendado)
+
+```bash
+pip install neo4j-test-server
+```
+
+```python
+from neo4j_test_server import Neo4jTestServer
+from neo4j import GraphDatabase
+
+with Neo4jTestServer() as server:
+    driver = GraphDatabase.driver(
+        server.bolt_uri,
+        auth=(server.username, server.password),
+    )
+    # ...
+```
+
+Uma fixture pytest `neo4j_test_server` (session-scoped) também é registrada
+automaticamente. Veja [`python/README.md`](python/README.md).
+
+### Via JAR manual
 
 Gere o fat JAR uma vez:
 
@@ -102,6 +137,16 @@ src/test/kotlin/neo4jtest/server/
 examples/python/
 ├── example_client.py        # cliente de exemplo que consome o servidor
 └── requirements.txt
+
+python/                        # pacote pip publicável
+├── pyproject.toml
+├── README.md
+├── src/neo4j_test_server/     # bootstrap do JAR + context manager + fixture pytest
+└── tests/
+
+.github/workflows/
+├── build.yml                  # CI: testes Kotlin + testes do pacote Python
+└── release.yml                # tag v* → GitHub Release (JAR) + PyPI (wheel)
 ```
 
 ## Licença
