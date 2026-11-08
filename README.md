@@ -28,7 +28,7 @@ Ele sobe uma instância do Neo4j via [neo4j-harness](https://neo4j.com/docs/oper
 
 ## Stack
 
-- Java 21 + Gradle
+- Java 21 + Kotlin 2.2 (Kotlin DSL)
 - `org.neo4j.test:neo4j-harness`
 - Jackson (serialização do handshake)
 - JUnit 5 + neo4j-java-driver (testes)
@@ -65,12 +65,12 @@ python example_client.py
 ## Estrutura
 
 ```
-src/main/java/neo4jtest/server/
-└── Neo4jTestServer.java      # entry point: sobe Neo4j, handshake JSON, shutdown via stdin
+src/main/kotlin/neo4jtest/server/
+└── Neo4jTestServer.kt        # entry point: sobe Neo4j, handshake JSON, shutdown via stdin
 
-src/test/java/neo4jtest/server/
-├── HarnessSmokeTest.java           # smoke test do harness in-process
-└── Neo4jTestServerProcessTest.java # teste end-to-end do processo (startup → query → shutdown)
+src/test/kotlin/neo4jtest/server/
+├── HarnessSmokeTest.kt           # smoke test do harness in-process
+└── Neo4jTestServerProcessTest.kt # teste end-to-end do processo (startup → query → shutdown)
 
 examples/python/
 ├── example_client.py        # cliente de exemplo que consome o servidor
