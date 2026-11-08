@@ -1,5 +1,9 @@
 # neo4j-test-server
 
+[![Build](https://github.com/vshofar/neo4j-test-server/actions/workflows/build.yml/badge.svg)](https://github.com/vshofar/neo4j-test-server/actions/workflows/build.yml)
+[![PyPI](https://img.shields.io/pypi/v/neo4j-test-server)](https://pypi.org/project/neo4j-test-server/)
+[![License: MIT](https://img.shields.io/pypi/l/neo4j-test-server)](LICENSE)
+
 Servidor Neo4j descartável, em processo, projetado para testes de integração.
 
 Ele sobe uma instância do Neo4j via [neo4j-harness](https://neo4j.com/docs/operations-manual/current/docker/neo4j-harness/) (in-process, sem Docker), imprime um JSON de readiness no `stdout` com a URI Bolt e credenciais geradas aleatoriamente, e permanece vivo até receber `shutdown` no `stdin`.
@@ -115,7 +119,7 @@ A task `printClasspath` imprime o classpath completo do projeto para uso externo
 
 ## Exemplo em Python
 
-Veja [`examples/python/example_client.py`](examples/python/example_client.py):
+Veja [`examples/python/example_client.py`](examples/python/example_client.py) — um cliente completo que usa o pacote `neo4j-test-server` do PyPI:
 
 ```bash
 cd examples/python
